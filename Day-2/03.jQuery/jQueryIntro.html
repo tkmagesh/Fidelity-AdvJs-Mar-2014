@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>jQuery Intro</title>
+	<style>
+	label{
+		display : block;
+	}
+	.error {
+		border : 2px solid red;
+		background-color: lightpink;
+	}
+	</style>
+	<script src="jquery.js"></script>
+	<script>
+	
+	$(function(){
+		$("#btnGreet").click(function(){
+		   if ($("#txtFirstName").val() === "") {
+		     $("#txtFirstName").addClass("error");
+		   } else {
+		     $("#txtFirstName").removeClass("error");
+		   }
+		   if ($("#txtLastName").val() === "") {
+		     $("#txtLastName").addClass("error");
+		   } else {
+		     $("#txtLastName").removeClass("error");
+		   }
+		});
+	});
+	</script>
+</head>
+<body>
+	<div><label>First Name:</label><input type="text" name="" id="txtFirstName" class="nameBox"></div>
+	
+	<div><label for="">Last Name:</label><input type="text" name="" id="txtLastName" class="nameBox"></div>
+	<input type="button" value="Greet" id="btnGreet">
+	<div id="divMessage"></div>
+</body>
+</html>
