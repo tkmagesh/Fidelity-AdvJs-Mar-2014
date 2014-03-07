@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en" id="root">
+<head>
+	<meta charset="UTF-8">
+	<title>Event Bubbling</title>
+	<style>
+	div,span{
+		padding : 30px;
+	}
+	#div1{
+		border : 2px solid blue;
+		background-color: lightblue;
+	}
+	#div2{
+		border : 2px solid red;
+		background-color: lightpink;
+	}
+	#div3{
+		border : 2px solid green;
+		background-color: lightgreen;
+	}
+	span{
+		background-color: #777;
+	}
+
+	</style>
+</head>
+<body id="docBody">
+	<div id="div1">
+		<div id="div2">
+			<div id="div3"><span id="spanContent">Some content goes here</span></div>
+		</div>
+	</div>
+	<script>
+	var allDivs = document.querySelectorAll("div");
+	for(var i=0;i<allDivs.length;i++)
+		allDivs[i].addEventListener("click",onNodeClick);
+	document.getElementById("spanContent").addEventListener("click",onNodeClick);
+	document.body.addEventListener("click",onNodeClick);
+	document.documentElement.addEventListener("click",onNodeClick);
+	function onNodeClick(e){
+		if (this.id==="div1")
+			e.stopPropagation();
+		console.log(this.id +" node clicked");
+	}
+	</script>
+</body>
+</html>

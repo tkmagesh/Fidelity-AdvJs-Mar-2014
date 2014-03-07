@@ -10,50 +10,28 @@
 		text-decoration: line-through;
 	}
 	</style>
+	<script src="jquery.js"></script>
 	<script>
-	(function(){
-		var txtTask, ulTaskList;
+	$(function(){
+			$("#btnAdd").click(onBtnAddClick);
+			$("#btnRemoveCompleted").click(onBtnRemoveCompletedClick);
+			$("#ulTaskList").on("click",onTaskItemClick);
 
-		window.addEventListener("DOMContentLoaded",init);
-		function init(){
-			document.getElementById("btnAdd").addEventListener("click",onBtnAddClick);
-			document.getElementById("btnRemoveCompleted").addEventListener("click",onBtnRemoveCompletedClick);
-			txtTask = document.getElementById("txtTask");
-			ulTaskList = document.getElementById("ulTaskList");
-			attachClickHandlerForDefaultTasks();
-		}
-
-		function attachClickHandlerForDefaultTasks(){
-			for(var i=ulTaskList.children.length-1;i>=0;i--){
-				ulTaskList.children[i].addEventListener("click",onTaskItemClick);
+			function onBtnAddClick(){
+				$("<li></li>")
+					.html($("#txtTask").val())
+					.appendTo("#ulTaskList");
 			}
-		}
 
-		function onBtnAddClick(){
-			var taskName = txtTask.value;
-			var newTaskItem = document.createElement("li");
-			newTaskItem.innerHTML = taskName;
-			newTaskItem.addEventListener("click",onTaskItemClick);
-			ulTaskList.appendChild(newTaskItem);
-		}
-
-		function onTaskItemClick(){
-			if (this.classList.contains("completed")){
-				this.classList.remove("completed");
-			} else {
-				this.classList.add("completed");
+			function onTaskItemClick(){
+				$(this).toggleClass("completed");
 			}
-		}
 
-		function onBtnRemoveCompletedClick(){
-			for(var i=ulTaskList.children.length-1;i>=0;i--){
-				var taskItem = ulTaskList.children[i];
-				if (taskItem.classList.contains("completed")){
-					taskItem.remove();
-				}
+			function onBtnRemoveCompletedClick(){
+				$("#ulTaskList > li.completed").remove();
 			}
-		}
-	})();
+
+	});
 	</script>
 </head>
 <body>
