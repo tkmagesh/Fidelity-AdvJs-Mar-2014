@@ -13,13 +13,30 @@
 	<script src="jquery.js"></script>
 	<script>
 	$(function(){
+		new TaskUI().init();
+	});
+
+	function TaskUI(){
+		this.init = function(){
+			var storage = new TaskStorage();
 			$("#btnAdd").click(onBtnAddClick);
 			$("#btnRemoveCompleted").click(onBtnRemoveCompletedClick);
 			$("#ulTaskList").on("click",onTaskItemClick);
+			loadTasksFromStorage();
 
+			function loadTasksFromStorage(){
+				var tasks = storage.getAll();
+				tasks.forEach(addTaskToUi);
+			}
 			function onBtnAddClick(){
+				var newTask = storage.add($("#txtTask").val());
+				addTaskToUi(newTask);
+			}
+
+			function addTaskToUi(task){
 				$("<li></li>")
-					.html($("#txtTask").val())
+					.attr("task-id",task.id)
+					.html(task.name)
 					.appendTo("#ulTaskList");
 			}
 
@@ -28,10 +45,38 @@
 			}
 
 			function onBtnRemoveCompletedClick(){
-				$("#ulTaskList > li.completed").remove();
+				$("#ulTaskList > li.completed").each(function(){
+					storage.remove($(this).attr("task-id"));
+				});
 			}
+		}
+	}
+	function TaskStorage(){
+		this.storage = window.localStorage;
+	}
+	TaskStorage.prototype.add = function(taskName){
+		var newId = new Date().getTime().toString();
+		this.storage.setItem(newId,taskName);
+		return new Task(newId,taskName);
+	};
+	TaskStorage.prototype.remove = function(id){
+		this.storage.removeItem(id);
+	};
+	TaskStorage.prototype.getAll = function(){
+		var tasks = [];
+		for(var i=0;i<this.storage.length;i++){
+			var id = this.storage.key(i);
+			var name = this.storage.getItem(id);
+			tasks.push(new Task(id,name));
+		}
+		return tasks;
+	}
 
-	});
+	function Task(id,name){
+		this.id = id;
+		this.name = name;
+	}
+
 	</script>
 </head>
 <body>
@@ -42,10 +87,9 @@
 	<input type="button" value="Add Task" id="btnAdd">
 	<input type="button" value="Remove Completed" id="btnRemoveCompleted">
 	<ul id="ulTaskList">
-		<li>Task -1</li>
-		<li>Task -2</li>
-		<li>Task -3</li>
+		
 	</ul>
 	<div id="divMessage"></div>
+	<xyz></xyz>
 </body>
 </html>
