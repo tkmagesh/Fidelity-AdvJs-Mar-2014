@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Greet Demo</title>
+	<script src="jquery.js"></script>
+	<script>
+	function GreetModel(){
+		var _changeSubscribers = {},
+			_firstName = "",
+			_lastName = "",
+			_fullName = "";
+
+		this.firstName = function(val){
+			if (typeof val === "undefined") return _firstName;
+			_firstName = val;
+			triggerChange("firstName");
+		};
+
+		this.lastName = function(val){
+			if (typeof val === "undefined") return _lastName;
+			_lastName = val;
+			triggerChange("lastName");
+		};
+
+		this.addOnChange = function(attrName,callbackFn){
+			if (typeof _changeSubscribers[attrName] === "undefined") 
+				_changeSubscribers[attrName] = [];
+			_changeSubscribers[attrName].push(callbackFn);
+		};
+		
+		function triggerChange(attrName){
+			var callbacks = _changeSubscribers[attrName] || [];
+			callbacks.forEach(function (cb){
+				setTimeout(cb);
+			});
+		}
+
+		this.greet = function(){
+			this.greetMsg = "Hi " + this.firstName() + " " + this.lastName() + ", Good Morning!!";
+			triggerChange("greetMsg");
+		}
+
+	}
+
+	function GreetView(model,templateId){
+		var _model = model,
+			_templateId = templateId;
+		this.init = function(){
+			var that = this;
+
+			this.$el = $("<div>");
+
+			this.$el.on("change","#txtFirstName",function(){
+				_model.firstName(this.value);
+			});
+			this.$el.on("change","#txtLastName",function(){
+				_model.lastName(this.value);
+			});
+			this.$el.on("click","#btnGreet",function(){
+				_model.greet();
+			});
+
+			_model.addOnChange("firstName",function(){
+				that.$el.find("#txtFirstName").val(_model.firstName());
+			});
+
+			_model.addOnChange("lastName",function(){
+				that.$el.find("#txtLastName").val(_model.lastName());
+			});
+
+			_model.addOnChange("greetMsg",function(){
+				that.$el.find("#divGreetMsg").text(_model.greetMsg);
+			});
+		};
+		this.render = function(){
+			this.$el.append($(_templateId).html());
+			this.$el.find("#txtFirstName").val(_model.firstName());
+			this.$el.find("#txtlastName").val(_model.lastName());
+			return this;
+		}
+
+	}
+	</script>
+	<script type="text/template" id="greetTemplate">
+		<div id="divContent">
+		<div><span>First Name:</span><input type="text" name="" id="txtFirstName"></div>
+		<div><span>Last Name:</span><input type="text" name="" id="txtLastName"></div>
+		<div><input type="button" value="Greet" id="btnGreet"></div>
+		<div>
+			<div id="divGreetMsg"></div>
+		</div>
+	</div>
+	</script>
+</head>
+<body>
+	
+</body>
+</html>

@@ -61,8 +61,12 @@
 		this.init = function(){
 			var that = this;
 			this.$el = $("<li>");
-			this.$el.on("click",function(){
+			this.$el.on("click","#spanTaskName", function(){
 				task.toggleCompletion();
+			});
+
+			this.$el.on("click","#btnRemoveTask",function(){
+				console.log("Attempting to remove task " , task.name());
 			});
 
 			task.addOnChange("isCompleted",function(){
@@ -74,13 +78,16 @@
 			});
 
 			task.addOnChange("name",function(){
-				that.$el.text(task.name());
+				that.$el.find("#spanTaskName").text(task.name());
 			});
+
+
 
 		}
 
 		this.render = function(){
-			this.$el.text(task.name());
+			this.$el.append($(_templateId).html());
+			this.$el.find("#spanTaskName").text(task.name());
 			if (task.isCompleted()){
 				this.$el.addClass("completed");
 			} else {
@@ -132,7 +139,7 @@
 			});
 
 			_collection.addOnChange("added",function(newTask){
-				var newTaskView = new TaskView(newTask);
+				var newTaskView = new TaskView(newTask,"#taskTemplate");
 				newTaskView.init();
 				that.$el.find("#ulTaskList").append(newTaskView.render().$el);
 			});
@@ -147,6 +154,12 @@
 	}
 
 	</script>
+	<script type="text/template" id="taskTemplate">
+		<div>
+			<span id="spanTaskName"></span>
+			<input type="button" id="btnRemoveTask" value="Remove">
+		</div>
+	</script>
 	<script type="text/template" id="taskAppTemplate">
 		<div id="divContent">
 		<span>Task :</span>
@@ -154,6 +167,15 @@
 		<input type="button" value="Add Task" id="btnAddTask">
 		<ul id="ulTaskList"></ul>
 		</div>
+	</script>
+	<script>
+	var taskCollection = new TaskCollection();
+	var appView = new TaskAppView(taskCollection,"#taskAppTemplate");
+
+	$(function(){
+		appView.init();
+		appView.render().$el.appendTo(document.body);
+	});
 	</script>
 </head>
 <body>
