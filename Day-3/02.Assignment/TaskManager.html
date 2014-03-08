@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<style>
+	.completed {
+		color : red;
+		font-style: italic;
+		text-decoration: line-through;
+	}
+	</style>
+	<script src="jquery.js"></script>
+	<script>
+	function Task(){
+		var _changeSubscribers = {},
+			_id = 0,
+			_name = "",
+			_isCompleted = false;
+
+		this.id = function(val){
+			if (typeof val === "undefined") return _id;
+			_id = val;
+			triggerChange('id');
+		};
+
+		this.name = function(val){
+			if (typeof val === "undefined") return _name;
+			_name = val;
+			triggerChange('name');
+		};
+
+		this.isCompleted = function(){
+			return _isCompleted;
+		};
+
+		this.toggleCompletion = function(){
+			_isCompleted = !_isCompleted;
+			triggerChange("isCompleted");
+		}
+
+		this.addOnChange = function(attrName,callbackFn){
+			if (typeof _changeSubscribers[attrName] === "undefined") 
+				_changeSubscribers[attrName] = [];
+			_changeSubscribers[attrName].push(callbackFn);
+		};
+		
+		function triggerChange(attrName){
+			var callbacks = _changeSubscribers[attrName] || [];
+			callbacks.forEach(function (cb){
+				setTimeout(cb);
+			});
+		}
+		
+	}
+
+	function TaskView(model,templateId){
+		var task = model,
+			_templateId = templateId;
+
+		this.init = function(){
+			var that = this;
+			this.$el = $("<li>");
+			this.$el.on("click",function(){
+				task.toggleCompletion();
+			});
+
+			task.addOnChange("isCompleted",function(){
+				if (task.isCompleted()){
+					that.$el.addClass("completed");
+				} else {
+					that.$el.removeClass("completed");
+				}
+			});
+
+			task.addOnChange("name",function(){
+				that.$el.text(task.name());
+			});
+
+		}
+
+		this.render = function(){
+			this.$el.text(task.name());
+			if (task.isCompleted()){
+				this.$el.addClass("completed");
+			} else {
+				this.$el.removeClass("completed");
+			}
+			return this;
+		}
+
+	}
+
+	function TaskCollection(){
+		var _changeSubscribers = {},
+			_taskList= [];
+
+		this.addOnChange = function(attrName,callbackFn){
+			if (typeof _changeSubscribers[attrName] === "undefined") 
+				_changeSubscribers[attrName] = [];
+			_changeSubscribers[attrName].push(callbackFn);
+		};
+		
+		function triggerChange(attrName){
+			var callbacks = _changeSubscribers[attrName] || [];
+			var args = Array.prototype.slice.call(arguments,1);
+			callbacks.forEach(function (cb){
+				setTimeout(function(){
+					cb.apply(this,args);
+				});
+			});
+		}
+
+		this.add = function(taskName){
+			var newTask = new Task();
+			newTask.id(new Date().getTime().toString());
+			newTask.name(taskName);
+			_taskList.push(newTask);
+			triggerChange('added',newTask)
+		}
+	}
+
+	function TaskAppView(collection,templateId){
+		var _collection = collection,
+			_templateId = templateId;
+
+		this.init = function(){
+			this.$el = $("<div>");
+			var that = this;
+			this.$el.on("click","#btnAddTask",function(){
+				_collection.add(that.$el.find("#txtTask").val());
+			});
+
+			_collection.addOnChange("added",function(newTask){
+				var newTaskView = new TaskView(newTask);
+				newTaskView.init();
+				that.$el.find("#ulTaskList").append(newTaskView.render().$el);
+			});
+		};
+
+		this.render = function(){
+			this.$el.append($(_templateId).html());
+			return this;
+		}
+
+
+	}
+
+	</script>
+	<script type="text/template" id="taskAppTemplate">
+		<div id="divContent">
+		<span>Task :</span>
+		<input type="text" name="" id="txtTask">
+		<input type="button" value="Add Task" id="btnAddTask">
+		<ul id="ulTaskList"></ul>
+		</div>
+	</script>
+</head>
+<body>
+	<h1>Task Manager</h1>
+	<hr>
+	
+</body>
+</html>
