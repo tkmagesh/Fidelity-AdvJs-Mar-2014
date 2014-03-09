@@ -88,3 +88,9 @@ var prodAndCategory = join(products,categories
 	, function(c){ return c.id;}	,function(pid,cid){ return pid - cid;}
 	,function(p,c){ return { id: p.id, name : p.name, cost: p.cost, units : p.units, category : c.name};}
 );
+
+function bind(fn,context){
+   return function(){
+       return fn.apply(context,Array.prototype.slice.call(arguments));
+   }
+}
