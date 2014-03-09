@@ -7,6 +7,24 @@
 	<script src="underscore.js"></script>
 	<script src="backbone.js"></script>
 	<script src="backbone.localstorage.js"></script>
+	<script>
+	var Task = Backbone.Model.extend({
+	 defaults : {
+	   name : '',
+	   isCompleted : false
+	},
+	url : "http://localhost:8085/",
+	toggleCompletion : function(){
+	    this.set('isCompleted',!this.get('isCompleted'));
+	},
+	triggerCustomEvent : function(){
+	  this.trigger('customEvent');
+	}});
+
+	//create the TasksCollections
+	// -model
+	// -localStorage
+	</script>
 </head>
 <body>
 	
